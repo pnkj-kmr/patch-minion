@@ -32,6 +32,20 @@ chmod +x $(pwd)/minion.sh
 
 # Setting up service 
 echo "Setting up service for patch-minon"
+cat > $(pwd)/patch-minion.service << EOF
+[Unit]
+Description=EverestIMS Patch Minion
+Wants=NetworkManager-wait-online.service network.target network-online.target dbus.service
+After=NetworkManager-wait-online.service network-online.target
+[Service]
+Type=simple
+WorkingDirectory=$(pwd)
+OOMScoreAdjust=-1000
+ExecStart=$(pwd)/minion.sh
+TimeoutSec=300
+[Install]
+WantedBy=multi-user.target
+EOF
 cp $(pwd)/patch-minion.service /etc/systemd/system/patch-minion.service
 systemctl enable patch-minion.service
 systemctl start patch-minion.service
