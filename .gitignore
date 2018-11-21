@@ -1,0 +1,10 @@
+*.py[co]
+*.tar.gz
+
+env/
+backups/
+source/patches/
+source/logs/
+
+.history/
+.vscode/

@@ -1,0 +1,18 @@
+[Unit]
+Description=EverestIMS Patch Minion
+Wants=NetworkManager-wait-online.service network.target network-online.target dbus.service
+After=NetworkManager-wait-online.service network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/patch-minion/source
+
+OOMScoreAdjust=-1000
+
+ExecStart=/opt/patch-minion/source/start.sh
+
+TimeoutSec=300
+
+[Install]
+WantedBy=multi-user.target
+
