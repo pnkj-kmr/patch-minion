@@ -9,7 +9,7 @@ WorkingDirectory=/opt/patch-minion/source
 
 OOMScoreAdjust=-1000
 
-ExecStart=/opt/patch-minion/source/start.sh
+ExecStart=/opt/patch-minion/source/minion.sh
 
 TimeoutSec=300
 
