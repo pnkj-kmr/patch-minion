@@ -51,7 +51,7 @@ application_types = {
     3 : "NCCM",
 }
 
-application_actions = {
+patch_app_actions = {
     1: 'Patching & Restart App',
     2: 'Patching Only',
     3: 'Stop App Only',
@@ -141,9 +141,11 @@ def patch(request, logger, PatchInfoDB):
         logger.debug("Error found into applying application actions as %s" % error)
         return 400, error
 
+    desc_ = str(patch_app_actions.get(app_action, "Unknown")).upper()
     data_ret.update({
         "status" : "success",
-        "msg" : "Patch applied successfully.",
+        "msg" : "Task is executed successfully.",
+        "desc" : "Task action has been taken as %s" % desc_,
     })
     logger.info("Exiting with status %s" % data)
     return 201, data_ret
@@ -566,7 +568,7 @@ def everest_action(action, app_config, logger):
                 "desc" : "Application stopped with status %s" % (cmd_result),
             })
             ret['msg'] = "Application is stopped with status %s" % (cmd_result)
-            
+
         elif action in [4]:
             # applicaiton start 
             cmd_result = start_service(service_name)
@@ -601,7 +603,7 @@ def everest_action(action, app_config, logger):
             })
             ret['msg'] = "Application is restarted with %s. Refer app url <http://%s:%s>" % (cmd_result, app_config.get('ip'), app_config.get('port'))
 
-        logger.info("Exiting from application_actions function")
+        logger.info("Exiting from everest_action function")
         ret['status_code'] = 1
         ret["status"] = "success"
     except Exception,e:
@@ -667,7 +669,7 @@ def portal_action(action, app_config, logger):
             })
             ret['msg'] = "Application is restarted with %s. Refer app url <http://%s:%s>" % (cmd_result, app_config.get('ip'), app_config.get('port'))
 
-        logger.info("Exiting from application_actions function")
+        logger.info("Exiting from portal_action function")
         ret['status_code'] = 1
         ret["status"] = "success"
     except Exception,e:

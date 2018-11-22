@@ -8,3 +8,5 @@ source/logs/
 
 .history/
 .vscode/
+install_minion.sh
+patch-minion.zip
