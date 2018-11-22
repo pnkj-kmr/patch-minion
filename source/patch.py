@@ -18,7 +18,7 @@ response = {
     "status": "success/fail"
     "msg" : "<Name of action>"
     "desc" : "<ERROR MESSAGE DESCRIPTION>"
-    "list" : [<ABC>, ...]
+    "list" : [{status:0, name:<ABC>, {status:512, name:<CDF>}, ..}, ...] # if status==0 then success
 }
 """
 """
@@ -390,6 +390,7 @@ def applying_patch(data_dict, logger):
         backup_dir = application_loc + os.sep + 'patch_backups' + os.sep
         if not os.path.exists(backup_dir):
             os.makedirs(backup_dir)
+        file_success_count = 0
         for file_ in patch_file_dict['files']:
             cmd_result = -1
             # aborting source folder
@@ -448,17 +449,17 @@ def applying_patch(data_dict, logger):
             cmd_result = os.system(cmd)
             logger.debug("Executing patch cmd result $ %s" % cmd_result)
             if cmd_result == 0:
-                ret['list'].append(file_)
+                file_success_count += 1
+            ret['list'].append({"status":cmd_result, "name":file_})
         # TESTING
         # for cmd in cmd_list:
         #     print ">> $", cmd
         # print "\n>>>file1 ",len(patch_file_dict['files']),patch_file_dict['files']
         # print "\n>>>file2 ",len(ret['list']),ret['list']
         logger.info("Executed CMDs >> %s"  % cmd_list)
-        if len(patch_file_dict['files']) != len(ret['list']):
+        if len(patch_file_dict['files']) != file_success_count:
             ret['msg'] = "Patch (%s) file merged get failed" % patch_config.get('name', 'Patch')
-            ret['desc'] = "Moved file only as %s" % str(ret['list']).replace("'", "").replace('"', '')
-            ret['list'] = patch_file_dict['files']
+            ret['desc'] = "Please find list status below"
             return ret
         
         # status map
