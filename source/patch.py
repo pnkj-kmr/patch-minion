@@ -548,8 +548,6 @@ def everest_action(action, app_config, logger):
         logger.info("Entering into everest_action function")
         cmd_result = -1
         default_sleep = 120 #seconds
-
-        app_name = app_config.get('name')
         application_list.setdefault(app_config.get('name'), []).append({
             "msg" : "Application action (%s) is triggered."%action,
             "status" : "...",
@@ -558,11 +556,9 @@ def everest_action(action, app_config, logger):
         ret['msg'] = "Application action (%s) is triggered."%action
         service_name = str(app_config.get('service')).strip()
         if action in [3, 6]:
-            # applicaiton stop cmd
-            cmd = "service %s stop" % service_name
-            print ">>>cmd",cmd
-            cmd_result = os.system(cmd)
-            logger.info("App stopping %s with status %s" % (cmd, cmd_result))
+            # applicaiton stop 
+            cmd_result = stop_service(service_name)
+            logger.info("App stopping with status %s" % (cmd_result))
             application_list.setdefault(app_config.get('name'), []).append({
                 "msg" : "Application is stopped.",
                 "status" : "Stopped",
@@ -570,12 +566,11 @@ def everest_action(action, app_config, logger):
                 "desc" : "Application stopped with status %s" % (cmd_result),
             })
             ret['msg'] = "Application is stopped with status %s" % (cmd_result)
+            
         elif action in [4]:
-            # applicaiton start cmd
-            cmd = "service %s start" % service_name
-            print ">>>cmd",cmd
-            cmd_result = os.system(cmd)
-            logger.info("App starting %s with status %s" % (cmd, cmd_result))
+            # applicaiton start 
+            cmd_result = start_service(service_name)
+            logger.info("App starting with status %s" % (cmd_result))
             application_list.setdefault(app_config.get('name'), []).append({
                 "msg" : "Application is started. Refer app url <http://%s:%s>" % (app_config.get('ip'), app_config.get('port')),
                 "status" : "Started",
@@ -583,31 +578,26 @@ def everest_action(action, app_config, logger):
                 "desc" : "Application started with status %s" % (cmd_result),
             })
             ret['msg'] = "Application is started with status %s" % (cmd_result)
-        elif action in [1, 5]:
 
+        elif action in [1, 5]:
             ## NEED TO IMPLETED URL LEVEL RESTART
             # TODO
-
             # restarting application
             # stopping
-            cmd = "service %s stop" % service_name
-            print ">>>cmd",cmd
-            cmd_result = os.system(cmd)
-            logger.info("App stopping %s with status %s" % (cmd, cmd_result))
+            cmd_result = stop_service(service_name)
+            logger.info("App stopping with status %s" % (cmd_result))
             # setting sleep time 
             if safe_int(app_config.get('sleep')):
                 default_sleep = safe_int(app_config.get('sleep'))
             time.sleep(default_sleep)
             # starting
-            cmd = "service %s start" % service_name
-            print ">>>cmd",cmd
-            cmd_result = os.system(cmd)
-            logger.info("App starting %s with status %s" % (cmd, cmd_result))
-
+            cmd_result = start_service(service_name)
+            logger.info("App starting with status %s" % (cmd_result))
             application_list.setdefault(app_config.get('name'), []).append({
                 "msg" : "Application is restarted. Refer app url <http://%s:%s>" % (app_config.get('ip'), app_config.get('port')),
                 "status" : "Restarted",
                 "status_code" : 1,
+                "desc" : "Application restarted with status %s" % (cmd_result),
             })
             ret['msg'] = "Application is restarted with %s. Refer app url <http://%s:%s>" % (cmd_result, app_config.get('ip'), app_config.get('port'))
 
@@ -628,11 +618,68 @@ def everest_action(action, app_config, logger):
 def portal_action(action, app_config, logger):
     """ Funciton helps to start/stop/restart the Portal
     """
-    return {
-            "msg" : "NOT DEVELOPED YET",
-            "status" : "Failed",
-            "status_code" : -1,
-        }
+    ret = {}
+    ret["status"] = "fail"
+    ret["status_code"] = -1
+    try:
+        logger.info("Entering into portal_action function")
+        cmd_result = -1
+        application_list.setdefault(app_config.get('name'), []).append({
+            "msg" : "Application action (%s) is triggered."%action,
+            "status" : "...",
+            "status_code" : 0
+        })
+        ret['msg'] = "Application action (%s) is triggered."%action
+        service_name = str(app_config.get('service')).strip()
+        if action in [3, 6]:
+            # applicaiton stop 
+            cmd_result = stop_service(service_name)
+            logger.info("App stopping with status %s" % (cmd_result))
+            application_list.setdefault(app_config.get('name'), []).append({
+                "msg" : "Application is stopped.",
+                "status" : "Stopped",
+                "status_code" : 1,
+                "desc" : "Application stopped with status %s" % (cmd_result),
+            })
+            ret['msg'] = "Application is stopped with status %s" % (cmd_result)
+
+        elif action in [4]:
+            # applicaiton start
+            cmd_result = start_service(service_name)
+            logger.info("App starting with status %s" % (cmd_result))
+            application_list.setdefault(app_config.get('name'), []).append({
+                "msg" : "Application is started. Refer app url <http://%s:%s>" % (app_config.get('ip'), app_config.get('port')),
+                "status" : "Started",
+                "status_code" : 1,
+                "desc" : "Application started with status %s" % (cmd_result),
+            })
+            ret['msg'] = "Application is started with status %s" % (cmd_result)
+
+        elif action in [1, 5]:
+            # restarting application
+            cmd_result = restart_service(service_name)
+            logger.info("App restarting with status %s" % (cmd_result))
+            application_list.setdefault(app_config.get('name'), []).append({
+                "msg" : "Application is restarted. Refer app url <http://%s:%s>" % (app_config.get('ip'), app_config.get('port')),
+                "status" : "Restarted",
+                "status_code" : 1,
+                "desc" : "Application restarted with status %s" % (cmd_result),
+            })
+            ret['msg'] = "Application is restarted with %s. Refer app url <http://%s:%s>" % (cmd_result, app_config.get('ip'), app_config.get('port'))
+
+        logger.info("Exiting from application_actions function")
+        ret['status_code'] = 1
+        ret["status"] = "success"
+    except Exception,e:
+        print ">>>>Exception,e",Exception,e
+        # exc_type, exc_obj, exc_tb = sys.exc_info()
+        # fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        # print ">>>", exc_type, fname, exc_tb.tb_lineno
+        logger.error("Exception in portal_action %s" % str(e))
+        ret['msg'] = "Exception occured at applying - application action"
+        ret['desc'] = str(e)
+        ret['list'] = []
+    return ret
 
 def sd_action(action, app_config, logger):
     """ Funciton helps to start/stop/restart the SD

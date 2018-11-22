@@ -69,7 +69,9 @@ def start_service(app_name):
     service <app_name> start
     on terminal
     """
-    pass
+    cmd = "service %s start" % app_name
+    cmd_result = os.system(cmd)
+    return cmd_result
 
 def stop_service(app_name):
     """
@@ -78,7 +80,9 @@ def stop_service(app_name):
     service <app_name> stop
     on terminal
     """
-    pass
+    cmd = "service %s stop" % app_name
+    cmd_result = os.system(cmd)
+    return cmd_result
 
 def restart_service(app_name):
     """
@@ -87,4 +91,6 @@ def restart_service(app_name):
     service <app_name> restart
     on terminal
     """
-    pass
+    cmd = "service %s restart" % app_name
+    cmd_result = os.system(cmd)
+    return cmd_result

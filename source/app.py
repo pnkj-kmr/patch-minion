@@ -83,7 +83,7 @@ class Patch(db.Model):
     rpatch = db.Column(db.Text())
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
     return json_response(json.dumps('Patch-Minion welcome you :)'), 200)
 
@@ -114,6 +114,6 @@ if __name__ == "__main__":
             _check=safe_int(str(arg).replace('-p', ''));next_=1
         if 1000 <=_check <= 9999:
             port=_check;break
-    if not port:port=8808
+    if not port:port=8082
     app.run(debug=DEBUG, host="0.0.0.0", port=port)
 
